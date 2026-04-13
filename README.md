@@ -31,6 +31,28 @@ git clone https://github.com/Can-0f-Tuna/orchestrator-agent.git ~/.agents/skills
 claude-mpm skill-source add https://github.com/Can-0f-Tuna/orchestrator-agent.git
 ```
 
+## Setup (Important!)
+
+By default, the Orchestrator Agent instructs sub-agents to read `README.md`. If your project uses a different entry file (like `DOCS.md`, `AGENTS.md`, etc.), run the setup script:
+
+```bash
+# Navigate to the skill directory
+cd ~/.agents/skills/orchestrator-agent
+
+# Run interactive setup
+node scripts/setup.js
+```
+
+**The setup will ask:**
+> "What file should agents read to understand your project?"
+
+Choose from common options or specify your own. This creates a `.orchestrator` config file that tells the skill which file to use.
+
+**Manual alternative:**
+```bash
+echo "entry_file: DOCS.md" > ~/.agents/skills/orchestrator-agent/.orchestrator
+```
+
 ## Usage
 
 1. **Activate the skill**: "Use the orchestrator-agent skill"

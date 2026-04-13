@@ -41,6 +41,24 @@ Read the README.md file first before doing anything else.
 
 This is non-negotiable. No exceptions.
 
+### Configurable Entry File
+
+If a `.orchestrator` config file exists in the skill directory, use the configured `entry_file` instead of `README.md`:
+
+**Check for config:**
+```
+Read the DOCS.md file first before doing anything else.  # If entry_file: DOCS.md
+```
+
+**Setup the config:**
+```bash
+node scripts/setup.js  # Interactive prompt
+# OR manually:
+echo "entry_file: DOCS.md" > .orchestrator
+```
+
+**Default behavior:** If no `.orchestrator` file exists, fall back to `README.md`.
+
 ## Initial Session Protocol
 
 ### Step 1: Read README.md

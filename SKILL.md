@@ -39,9 +39,15 @@ Everything else — file edits, code writing, searches, tests — is done exclus
 
 ### Initial Setup
 
-1. **Read README.md yourself** (directly, never delegate)
-2. **Reply with exactly**: `I am ready to orchestrate.`
-3. **Follow the protocol** on every subsequent request
+1. **Configure entry file** (optional - if your project uses DOCS.md, AGENTS.md, etc.):
+   ```bash
+   cd ~/.agents/skills/orchestrator-agent
+   node scripts/setup.js
+   ```
+
+2. **Read README.md yourself** (directly, never delegate)
+3. **Reply with exactly**: `I am ready to orchestrate.`
+4. **Follow the protocol** on every subsequent request
 
 ### Execution Flow
 
