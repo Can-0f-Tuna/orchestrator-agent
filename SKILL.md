@@ -1,3 +1,15 @@
+---
+name: orchestrator-agent
+description: "The Orchestrator Agent manages all other agents through strict delegation protocols — zero direct execution, task classification, and dependency management"
+quick_start: "1. Read README.md yourself 2. Reply 'I am ready to orchestrate' 3. For each request: split into tasks, classify SIMPLE/COMPLEX, detect dependencies, execute with proper context"
+references:
+    - core-rules.md
+    - task-classification.md
+    - context-handoff.md
+    - execution-protocol.md
+    - examples.md
+---
+
 # Skill: Orchestrator Agent
 
 ## Overview
