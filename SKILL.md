@@ -314,6 +314,8 @@ Role: You are a debugging specialist.
 
 ### Phase 2: Spawn
 1. Run all independent SIMPLE tasks **in parallel**
+   - **Reading multiple files:** If you need to read 3+ files to understand the project, and they don't depend on each other, read them **all at once in parallel** — not one by one. This saves significant time.
+   - **Example:** `Read README.md` + `Read file-structure.md` + `Read modules/provider-system.md` should all be one parallel batch
 2. Start COMPLEX tasks with Stage 1
 3. Queue DEPENDENT simple tasks after their prerequisite stage
 
@@ -342,6 +344,11 @@ Before running tasks in parallel, check for file conflicts:
 1. If two tasks mention the same component or file → run sequentially
 2. If unsure whether tasks touch the same files → read `/orchestrator-agent-docs/file-structure.md` to check
 3. If still unsure → run sequentially. Safer to be slower than broken.
+
+### What CAN always run in parallel:
+- **Reading independent files** — You can read README.md, package.json, and tsconfig.json all at once
+- **Investigating different modules** — If sub-agents are exploring separate parts of the codebase
+- **Simple isolated changes** — Updating a color in one file and fixing a typo in another
 
 ---
 
