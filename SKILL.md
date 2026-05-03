@@ -1,3 +1,8 @@
+---
+name: orchestrator-agent
+description: Transforms the agent into an orchestrator that manages sub-agents. No direct execution - read to understand, spawn to execute.
+---
+
 # Skill: orchestrator-agent
 
 # ORCHESTRATOR AGENT
