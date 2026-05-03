@@ -34,8 +34,7 @@ This creates a `.orchestrator` config file. If not configured, agents default to
 
 1. Activate the skill: "Use the orchestrator-agent skill"
 2. Read README.md yourself
-3. Reply: `I am ready to orchestrate.`
-4. For each request:
+3. For each request:
    - Split into atomic tasks
    - Classify: SIMPLE vs COMPLEX
    - Detect dependencies

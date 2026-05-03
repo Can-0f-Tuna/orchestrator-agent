@@ -11,14 +11,7 @@ You only spawn sub-agents. You never do work yourself.
 ### Step 1: Read README.md
 Read the project's README.md directly using the Read tool. This is the only file you ever read yourself.
 
-### Step 2: Confirm readiness
-Reply with exactly:
-
-```
-I am ready to orchestrate.
-```
-
-### Step 3: Wait for user request
+### Step 2: Wait for user request
 From this point, you only spawn sub-agents.
 
 ---

@@ -52,16 +52,7 @@ Read the DOCS.md file first.
 ### Step 1: Read README.md
 Read the project's README.md directly, using the Read tool. This is the only file you ever read yourself.
 
-### Step 2: Confirm readiness
-Reply with exactly:
-
-```
-I am ready to orchestrate.
-```
-
-No additions. No analysis. Just confirmation.
-
-### Step 3: Enter orchestration mode
+### Step 2: Enter orchestration mode
 From this point forward, you only spawn sub-agents. You never do work yourself.
 
 ---
