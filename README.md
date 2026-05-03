@@ -1,71 +1,49 @@
 # Orchestrator Agent
 
-A Claude Code skill that transforms you into the Orchestrator Agent — the sole manager of all other agents. Orchestrate, delegate, and supervise without doing any direct work yourself.
+A skill that transforms you into the Orchestrator Agent — the manager and director of all sub-agents. Orchestrate, delegate, coordinate, and supervise without doing any direct work yourself.
 
 ## What It Does
 
-This skill establishes strict protocols for managing sub-agents:
+This skill establishes a professional protocol for managing sub-agents:
 
-- **Zero Direct Execution** — You never edit files, write code, or run tests yourself
-- **Task Classification** — Automatically splits work into SIMPLE (parallel) vs COMPLEX (staged)
-- **Dependency Management** — Detects task dependencies and queues them properly
-- **Context Handoff** — Minimal context for simple tasks, structured context for complex tasks
+- **Zero Direct Execution** — You never edit files, write code, or run tests yourself. You spawn sub-agents for everything.
+- **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks
+- **Dependency Management** — Detect task dependencies and queue them properly
+- **Prompt Engineering** — Write effective sub-agent prompts using role assignment, delimiters, structured output formats, and skill suggestions
+- **Skill Discovery** — Proactively suggest relevant skills to sub-agents so they work with the right tools and knowledge
+- **Stage Planning** — Break large tasks into ordered stages with context chains and verification gates
 
 ## Installation
 
-### Using `skills` CLI (Recommended)
 ```bash
 npx skills add https://github.com/Can-0f-Tuna/orchestrator-agent.git --skill orchestrator-agent
-# or
-pnpx skills add https://github.com/Can-0f-Tuna/orchestrator-agent.git --skill orchestrator-agent
 ```
 
-### Manual Installation
-```bash
-# Clone to your skills directory
-git clone https://github.com/Can-0f-Tuna/orchestrator-agent.git ~/.agents/skills/orchestrator-agent
-```
+## Setup
 
-### Claude MPM
-```bash
-claude-mpm skill-source add https://github.com/Can-0f-Tuna/orchestrator-agent.git
-```
-
-## Setup (Important!)
-
-By default, the Orchestrator Agent instructs sub-agents to read `README.md`. If your project uses a different entry file (like `DOCS.md`, `AGENTS.md`, etc.), run the setup script:
+Run the setup script to configure which file agents should read to understand your project:
 
 ```bash
-# Navigate to the skill directory
 cd ~/.agents/skills/orchestrator-agent
-
-# Run interactive setup
 node scripts/setup.js
 ```
 
-**The setup will ask:**
-> "What file should agents read to understand your project?"
-
-Choose from common options or specify your own. This creates a `.orchestrator` config file that tells the skill which file to use.
-
-**Manual alternative:**
-```bash
-echo "entry_file: DOCS.md" > ~/.agents/skills/orchestrator-agent/.orchestrator
-```
+This creates a `.orchestrator` config file. If not configured, agents default to reading `README.md`.
 
 ## Usage
 
-1. **Activate the skill**: "Use the orchestrator-agent skill"
-2. **Read README.md yourself** (directly, never delegate this)
-3. **Reply**: `I am ready to orchestrate.`
-4. **For each request**:
-   - Split into individual tasks
-   - Classify: SIMPLE (change color, fix typo) vs COMPLEX (new feature, refactoring)
+1. Activate the skill: "Use the orchestrator-agent skill"
+2. Read README.md yourself
+3. Reply: `I am ready to orchestrate.`
+4. For each request:
+   - Split into atomic tasks
+   - Classify: SIMPLE vs COMPLEX
    - Detect dependencies
+   - Identify relevant skills for each sub-agent
    - Execute:
-     - Independent SIMPLE tasks → Run in parallel
-     - COMPLEX tasks → Run in stages, wait between stages
-     - Dependent SIMPLE tasks → Queue, run after related stage
+     - Independent SIMPLE → parallel
+     - COMPLEX → sequential stages
+     - DEPENDENT → queued after prerequisite
 
 ## Example
 
@@ -76,59 +54,45 @@ echo "entry_file: DOCS.md" > ~/.agents/skills/orchestrator-agent/.orchestrator
    - "Change button color" → SIMPLE, independent
    - "Create About page" → COMPLEX (staged)
    - "Add navbar link" → SIMPLE, dependent on page creation
-
-2. Executes:
-   - Spawns sub-agent for button color change (parallel)
+2. Identifies skills: suggests frontend-design for the About page agent
+3. Executes:
+   - Spawns button color agent (parallel)
    - Starts Stage 1 of About page creation
-   - Waits for Stage 1 to complete
-   - Runs Stage 2 of About page
-   - Waits for completion
-   - Spawns sub-agent for navbar link (now unblocked)
+   - After Stage 1 completes, spawns navbar link agent
+4. Reports results
 
-## Core Rules
+## Core Principles
 
-1. **Only two exceptions to Zero Direct Execution:**
-   - Reading README.md at session start
-   - Spawning sub-agents via CLI
-
-2. **Every sub-agent MUST start with:**
-   ```
-   Read the README.md file first before doing anything else.
-   ```
-
-3. **Context protocols:**
-   - SIMPLE tasks: Minimal context only (task description, file path)
-   - COMPLEX tasks: Structured context (Grand Goal, History, Current Mission)
+1. **Only the orchestrator reads README.md** — every sub-agent is told to read it too
+2. **Every sub-agent prompt is a system prompt** — write it with care: role, delimiters, steps, constraints, output format
+3. **Skills are tools — suggest them** — tell sub-agents which skills would help them before they start
+4. **Large tasks are staged** — foundation first, verification gates, context chains
+5. **Structured reports matter** — tell sub-agents exactly what to report so you can make informed decisions
 
 ## Structure
 
 ```
 orchestrator-agent/
 ├── SKILL.md              # Entry point with core workflow
+├── README.md             # This file
+├── scripts/
+│   └── setup.js          # Interactive configuration
 └── references/
-    ├── core-rules.md     # Zero Direct Execution policy
-    ├── task-classification.md  # SIMPLE vs COMPLEX definitions
-    ├── context-handoff.md      # Context protocols
-    ├── execution-protocol.md   # Step-by-step execution
+    ├── core-rules.md     # Rules and rationale
+    ├── task-classification.md  # SIMPLE vs COMPLEX, staging
+    ├── context-handoff.md      # Prompt engineering & context
+    ├── execution-protocol.md   # Complete execution flow
     └── examples.md           # Real-world scenarios
 ```
 
 ## Requirements
 
-- Claude Code CLI or compatible agent framework
-- Sub-agent spawning capability
+- Agent framework with sub-agent spawning capability (Claude Code, Codex, etc.)
+- `task` tool access for spawning sub-agents
 
 ## License
 
 MIT License — Free to use, modify, and distribute.
-
-## Contributing
-
-This is a living skill. Test it, find edge cases, and improve it:
-1. Fork the repository
-2. Make your changes
-3. Test with real projects
-4. Submit a pull request
 
 ---
 

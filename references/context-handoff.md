@@ -1,174 +1,223 @@
-# Context Handoff Rules
+# Context Handoff & Prompt Engineering
 
 ## Overview
 
-How you package and transmit context to sub-agents is critical. Too much context wastes tokens and confuses. Too little context leaves sub-agents without needed information.
+How you package and transmit context to sub-agents is critical. Write prompts like system prompts — they shape the sub-agent's entire behavior. Too much context wastes tokens and confuses. Too little leaves sub-agents without needed information.
+
+System prompts are orders of magnitude more important than casual instructions. Your sub-agent prompts ARE their system prompts. Write them with care.
+
+---
+
+## Prompt Engineering Principles
+
+### 1. Assign a clear role
+Tell the sub-agent what kind of agent it is. This frames their entire approach:
+- "You are a developer making a focused, isolated change"
+- "You are a debugging specialist investigating a bug"
+- "You are a developer executing one stage of a multi-stage project"
+
+### 2. Use delimiters to separate sections
+XML-style tags help distinguish context, task, constraints, and expected output:
+
+```
+<GrandGoal>...</GrandGoal>
+<PreviousStages>...</PreviousStages>
+<YourMission>...</YourMission>
+<Constraints>...</Constraints>
+<Report>...</Report>
+```
+
+### 3. Specify clear steps
+Break the task into sequential steps. Explicit steps produce better output than vague instructions.
+
+### 4. Define the output format
+Tell the agent exactly what to report back. This is critical for the orchestrator to make decisions about next stages.
+
+### 5. Set boundaries
+What the agent should do AND what it should not do. When should it stop and ask?
+
+### 6. Suggest relevant skills
+Before the task, tell the sub-agent to check for skills that would help them succeed.
+
+---
 
 ## SIMPLE Tasks: Minimal Focused Context
 
-### The Principle
-Give **Minimal Focused Context ONLY** — never full history, never grand goal, never previous stages.
+### Principle
+Give only what's needed. No grand goal. No history. No previous stages.
 
-### What to Include
-The sub-agent must receive ONLY:
-- Exact description of what to do
-- Exact file/path if mentioned by user
-- Any specific detail the user gave
+### What to include:
+- Role assignment
+- Exact task description
+- File/path if specified
+- Constraints
+- Output format
+- Optional: relevant skill suggestions
 
-### Template Format
+### Template
 
 ```
-run agent "
 Read the README.md file first.
 
-Task: [exact user instruction, word for word if possible]
-Location: [file/path if known, otherwise "find the relevant file yourself"]
-Do exactly this and nothing else.
-"
+Role: [one sentence describing the agent's identity for this task]
+Before starting, check if [skill names] would help you.
+
+<Task>
+[Exact instruction]
+</Task>
+
+<Constraints>
+- Do exactly this and nothing else
+- Do not refactor, rename, or reorganize unrelated code
+</Constraints>
+
+<Report>
+1. File(s) changed
+2. Exact changes made
+3. Confirmation it works
+</Report>
 ```
 
-### Example: Simple Task
+### What NOT to include in simple tasks:
+- Grand Goal
+- History of previous work
+- "This is part of a larger..."
+- Full conversation context
 
-**User says:** "Change the button color in the navbar to blue"
-
-**Correct spawn:**
-```
-run agent "
-Read the README.md file first.
-
-Task: Change the button color in the navbar to blue
-Location: navbar component (find the relevant file yourself)
-Do exactly this and nothing else.
-"
-```
-
-**Incorrect spawn (too much context):**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: We're building a complete website redesign with new branding... [100 lines of history]
-Task: Change the button color...
-" 
-```
+---
 
 ## COMPLEX Tasks: Structured Context
 
-### The Principle
-Break into clear sequential STAGES. Wait for current stage to finish completely before starting next stage.
+### Principle
+Break into sequential stages. Each stage inherits context from previous stages.
 
-### What to Include
-For each sub-agent in a complex task use this exact structure:
+### What to include:
+- Role assignment
+- Grand Goal (one sentence)
+- Summary of all previous stages
+- Current mission with clear steps
+- Constraints
+- Detailed output format
+- Optional: relevant skill suggestions
+
+### Template
 
 ```
-run agent "
 Read the README.md file first.
 
-Grand Goal: [one short sentence - the final desired outcome]
-History / Previous stages: [short bullet list of what was already done]
-Current Mission (Stage X/Y): [exactly what this sub-agent needs to do now]
+Role: [one sentence describing the agent's identity]
+Before starting, check if [skill names] would help you.
 
-Do exactly this mission and nothing else.
-"
+<GrandGoal>
+[One sentence — the final outcome]
+</GrandGoal>
+
+<PreviousStages>
+- Stage 1: [what was done, key files, decisions]
+- Stage 2: [what was done, key files, decisions]
+</PreviousStages>
+
+<YourMission>
+Stage [X/N]: [Exactly what this agent must do]
+</YourMission>
+
+<Steps>
+1. [Step one]
+2. [Step two]
+3. [Step three]
+</Steps>
+
+<Constraints>
+- Only work on YourMission
+- Do not modify files from previous stages unless told to
+- Follow existing code conventions
+</Constraints>
+
+<Report>
+1. Files created/modified (full paths)
+2. Key decisions made and why
+3. Assumptions future stages should know
+4. Incomplete work or risk areas
+5. Verification performed
+6. Suggestions for next stage
+</Report>
 ```
 
-### Example: Complex Task
+---
 
-**User says:** "Build a new user authentication system"
+## Investigation Tasks: Discovery-Focused Context
 
-**Stage 1/3: Setup database schema**
+For bugs or issues where the solution isn't known upfront:
+
 ```
-run agent "
 Read the README.md file first.
 
-Grand Goal: Build a complete user authentication system
-History / Previous stages: None - this is stage 1
-Current Mission (Stage 1/3): Create database schema for users table with email, password_hash, created_at fields
+Role: [debugging specialist / code investigator]
+Before starting, check if systematic-debugging would help you.
 
-Do exactly this mission and nothing else.
-"
+<Problem>
+[Description of the issue]
+</Problem>
+
+<Instructions>
+1. Explore relevant code to understand the implementation
+2. Identify the root cause
+3. Implement the fix
+4. Verify the fix works
+</Instructions>
+
+<Report>
+1. Root cause found
+2. Files changed (with paths and line references)
+3. Verification method
+4. Side effects or related issues to watch
+</Report>
 ```
 
-**Stage 2/3: Create API endpoints**
+---
+
+## Skill Discovery in Sub-Agent Prompts
+
+Always consider whether skills would help your sub-agent. Include skill suggestions:
+
+### When to suggest skills to sub-agents:
+- **brainstorming** — if the sub-agent is designing a new feature or component
+- **systematic-debugging** — if the sub-agent is investigating a bug
+- **vercel-react-best-practices** — if working with React/Next.js code
+- **frontend-design** — if building UI components or pages
+- **fullstack-dev** — if building features with backend + frontend
+- **subagent-driven-development** — if the sub-agent's task is large enough to need delegation
+
+### How to include skill suggestions:
+
 ```
-run agent "
-Read the README.md file first.
+Before starting, check if any of these skills apply to your task:
+- brainstorming — if you need to design or plan before coding
+- systematic-debugging — if you need to investigate bugs
+- vercel-react-best-practices — if working with React code
 
-Grand Goal: Build a complete user authentication system
-History / Previous stages:
-- Stage 1 completed: Database schema created with users table
-Current Mission (Stage 2/3): Create /register and /login API endpoints that use the new schema
-
-Do exactly this mission and nothing else.
-"
-```
-
-**Stage 3/3: Build frontend forms**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: Build a complete user authentication system
-History / Previous stages:
-- Stage 1 completed: Database schema created
-- Stage 2 completed: /register and /login API endpoints created
-Current Mission (Stage 3/3): Create login and registration forms in the frontend that call the API endpoints
-
-Do exactly this mission and nothing else.
-"
+Load any that apply before you begin.
 ```
 
-## Context Handoff Checklist
-
-### For SIMPLE Tasks
-- [ ] No grand goal mentioned
-- [ ] No history from previous work
-- [ ] No previous stages referenced
-- [ ] Exact task description included
-- [ ] File/path specified (or "find it yourself")
-
-### For COMPLEX Tasks
-- [ ] Grand Goal: One short sentence
-- [ ] History: Short bullet list only
-- [ ] Current Mission: Specific and bounded
-- [ ] Stage number clear (X/Y format)
-- [ ] Previous stage completion confirmed
-
-## What NOT to Include
-
-**Never include in SIMPLE task context:**
-- ❌ "We're building a website..." (grand goal)
-- ❌ "Previously we did..." (stage history)
-- ❌ "This is part of a larger refactor..." (context pollution)
-- ❌ Full conversation history
-- ❌ Project background
-
-**Never include in COMPLEX task context:**
-- ❌ Irrelevant file contents
-- ❌ Unrelated feature discussions
-- ❌ Future stages (only current)
-- ❌ Overly verbose descriptions
+---
 
 ## Context Size Guidelines
 
-**SIMPLE task context:** 3-10 lines optimal
-**COMPLEX task context:** 10-20 lines optimal
+- **SIMPLE tasks:** 5-15 lines
+- **COMPLEX task stages:** 15-35 lines
 
-If your context is longer, review and trim.
+If your prompt is longer, the scope is too wide — split into another stage.
+
+---
 
 ## Anti-Patterns
 
-**Pattern: The Dump**
-Dumping everything you know into sub-agent context.
+**The Dump:** Dumping everything you know into the sub-agent's context. Wastes tokens, confuses focus.
 
-**Why Bad:** Wastes tokens, confuses focus, sub-agent gets lost in noise.
+**The Mystery:** Giving almost no context. Sub-agent doesn't have enough to succeed.
 
-**Pattern: The Mystery**
-Giving almost no context.
+**The Leak:** Including context from unrelated tasks. Creates confusion about scope.
 
-**Why Bad:** Sub-agent doesn't have enough to succeed, will fail or ask questions.
+**The Missing Output Format:** Not specifying what the sub-agent should report. You get back unstructured information you can't use effectively.
 
-**Pattern: The Leak**
-Including context from unrelated tasks.
-
-**Why Bad:** Creates confusion about scope, may cause unwanted side effects.
+**The Skill Blindness:** Not suggesting skills. The sub-agent works without specialized knowledge that's available.

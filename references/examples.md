@@ -9,41 +9,73 @@
 - Task B: Fix footer typo → SIMPLE, independent
 - Task C: Add navbar border → SIMPLE, independent
 
-### Execution
+### Execution — All three spawned in parallel
 
-**Orchestrator spawns all three in parallel:**
-
+**Agent 1:**
 ```
-run agent "
 Read the README.md file first.
 
-Task: Change the hero button color to blue
-Location: hero component (find the relevant file yourself)
-Do exactly this and nothing else.
-"
+Role: You are a developer making a focused CSS change.
+Before starting, check if vercel-react-best-practices or frontend-design apply.
+
+<Task>
+Change the hero button color to blue in the hero component.
+</Task>
+
+<Constraints>
+- Do exactly this and nothing else
+</Constraints>
+
+<Report>
+1. File changed
+2. Exact change made
+3. Confirmation it works
+</Report>
 ```
 
+**Agent 2:**
 ```
-run agent "
 Read the README.md file first.
 
-Task: Fix the typo in the footer
-Location: footer component (find the relevant file yourself)
-Do exactly this and nothing else.
-"
+Role: You are a developer making a focused text fix.
+
+<Task>
+Fix the typo in the footer component.
+</Task>
+
+<Constraints>
+- Do exactly this and nothing else
+</Constraints>
+
+<Report>
+1. File changed
+2. Exact change made
+3. Confirmation it works
+</Report>
 ```
 
+**Agent 3:**
 ```
-run agent "
 Read the README.md file first.
 
-Task: Add a border to the navbar
-Location: navbar component (find the relevant file yourself)
-Do exactly this and nothing else.
-"
+Role: You are a developer making a focused CSS change.
+
+<Task>
+Add a border to the navbar component.
+</Task>
+
+<Constraints>
+- Do exactly this and nothing else
+</Constraints>
+
+<Report>
+1. File changed
+2. Exact change made
+3. Confirmation it works
+</Report>
 ```
 
-**All three run in parallel. Orchestrator waits for all to complete, then reports success.**
+**All three run in parallel. Orchestrator waits for all to complete, reports success.**
 
 ---
 
@@ -52,215 +84,293 @@ Do exactly this and nothing else.
 **User Request:** "Create a new About page and add a link to it in the navbar"
 
 ### Classification
-- Task A: Create About page → COMPLEX (new feature, multiple components)
-- Task B: Add navbar link → SIMPLE, but DEPENDENT (needs page route first)
+- Task A: Create About page → COMPLEX (new feature)
+- Task B: Add navbar link → SIMPLE, DEPENDENT (needs page route)
 
 ### Execution
 
-**Step 1: Queue dependent task**
-- Task B queued (will run after Task A stage 1)
-
-**Step 2: Start Complex Task Stage 1/2**
-
+**Stage 1/2: Create the About page**
 ```
-run agent "
 Read the README.md file first.
 
-Grand Goal: Create a new About page and link it in the navbar
-History / Previous stages: None - this is stage 1
-Current Mission (Stage 1/2): Create the About page component at /about route with proper layout and content
+Role: You are a developer creating a new page.
+Before starting, check if frontend-design applies.
 
-Do exactly this mission and nothing else.
-"
+<GrandGoal>
+Add an About page at /about and link it in the navbar.
+</GrandGoal>
+
+<PreviousStages>
+None — this is stage 1.
+</PreviousStages>
+
+<YourMission>
+Stage 1/2: Create the About page component at the /about route.
+</YourMission>
+
+<Steps>
+1. Create the page component with proper layout and content
+2. Add the route in the routing configuration
+3. Verify the page renders at /about
+</Steps>
+
+<Constraints>
+- Only create the page and route
+- Follow existing project patterns for pages
+</Constraints>
+
+<Report>
+1. Files created/modified
+2. Route path used
+3. Key decisions
+4. Verification performed
+5. Suggestions for navbar link stage
+</Report>
 ```
 
-**Wait for Stage 1 completion...**
-
-**Step 3: Unblock and run dependent simple task**
-
+**After Stage 1 completes, run dependent task:**
 ```
-run agent "
 Read the README.md file first.
 
-Task: Add a link to the About page in the navbar
-Location: navbar component
-Context: The About page is now available at /about route
-Do exactly this and nothing else.
-"
+Role: You are a developer adding a single navigation link.
+
+<Task>
+Add a link to the About page in the navbar.
+</Task>
+
+<Context>
+The About page is available at /about route.
+</Context>
+
+<Constraints>
+- Do exactly this and nothing else
+- Place the link in a logical position in the navbar
+</Constraints>
+
+<Report>
+1. File changed
+2. Where the link was added
+3. Confirmation it navigates correctly
+</Report>
 ```
-
-**Wait for Task B completion...**
-
-**Step 4: Report success to user**
 
 ---
 
-## Example 3: Multi-Stage Complex Task
+## Example 3: Large Multi-Stage Project
 
-**User Request:** "Build a complete authentication system with login, register, and logout"
+**User Request:** "We are forking this ABC repo from GitHub and our goal is to turn it into DEFG. Go through the entire codebase, remove what we don't need, and make sure we don't break the project."
 
 ### Classification
-- Task: Build auth system → COMPLEX, requires multiple stages
+- Task: Codebase cleanup → COMPLEX, requires multiple careful stages
 
-### Stage Breakdown
-1. Stage 1: Database schema
-2. Stage 2: API endpoints
-3. Stage 3: Frontend forms
-4. Stage 4: Integration testing
+### Stage Planning
+This is a large task. If given to one agent, it would overflow context and produce unreliable results. Break it into stages:
 
-### Execution
-
-**Stage 1/4: Database Schema**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: Build a complete authentication system with login, register, and logout
-History / Previous stages: None - this is stage 1
-Current Mission (Stage 1/4): Create database schema with users table (id, email, password_hash, created_at, updated_at)
-
-Do exactly this mission and nothing else.
-"
-```
-
-**Wait...**
-
-**Stage 2/4: API Endpoints**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: Build a complete authentication system with login, register, and logout
-History / Previous stages:
-- Stage 1 completed: Database schema created with users table
-Current Mission (Stage 2/4): Create /api/auth/register, /api/auth/login, and /api/auth/logout endpoints using the database schema
-
-Do exactly this mission and nothing else.
-"
-```
-
-**Wait...**
-
-**Stage 3/4: Frontend Forms**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: Build a complete authentication system with login, register, and logout
-History / Previous stages:
-- Stage 1 completed: Database schema created
-- Stage 2 completed: API endpoints created at /api/auth/*
-Current Mission (Stage 3/4): Create LoginForm and RegisterForm components that call the API endpoints
-
-Do exactly this mission and nothing else.
-"
-```
-
-**Wait...**
-
-**Stage 4/4: Integration**
-```
-run agent "
-Read the README.md file first.
-
-Grand Goal: Build a complete authentication system with login, register, and logout
-History / Previous stages:
-- Stage 1 completed: Database schema created
-- Stage 2 completed: API endpoints created
-- Stage 3 completed: Frontend forms created
-Current Mission (Stage 4/4): Add the auth forms to the appropriate pages and verify the complete flow works end-to-end
-
-Do exactly this mission and nothing else.
-"
-```
-
-**Wait... Report success.**
-
----
-
-## Example 4: Mixed Simple and Complex
-
-**User Request:** "Fix the contact form validation, build a new dashboard page, and update the copyright year"
-
-### Classification
-- Task A: Fix contact form validation → COMPLEX (may require debugging, testing)
-- Task B: Build dashboard page → COMPLEX (new feature)
-- Task C: Update copyright year → SIMPLE, independent
+1. **Stage 1: Exploration and mapping** — Understand the codebase structure, map dependencies
+2. **Stage 2: Identify removable code** — List files, modules, and features to remove
+3. **Stage 3: Remove non-breaking code** — Delete clearly unused code, verify project builds
+4. **Stage 4: Remove features** — Delete identified features one at a time, verify after each
+5. **Stage 5: Final cleanup** — Remove dead imports, unused dependencies, verify everything works
 
 ### Execution
 
-**Step 1: Run independent simple task immediately (parallel with complex starts)**
+**Stage 1/5: Exploration**
 ```
-run agent "
 Read the README.md file first.
 
-Task: Update the copyright year
-Location: footer component (find the relevant file yourself)
-Do exactly this and nothing else.
-"
+Role: You are a codebase analyst mapping project structure.
+
+<GrandGoal>
+Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
+</GrandGoal>
+
+<PreviousStages>
+None — this is stage 1.
+</PreviousStages>
+
+<YourMission>
+Stage 1/5: Explore the entire codebase and document its structure.
+</YourMission>
+
+<Steps>
+1. Map the directory structure and key entry points
+2. Identify which packages/modules are used
+3. Document how features connect to each other
+4. List all external dependencies
+5. Identify the core of the project (what must stay)
+</Steps>
+
+<Constraints>
+- Do not delete or modify any files
+- Focus only on understanding and documenting
+</Constraints>
+
+<Report>
+1. Complete directory tree
+2. Feature/module map with dependencies between them
+3. List of what appears to be the core vs. peripheral code
+4. External dependency list with usage locations
+5. Suggestions for what can safely be removed
+6. Any areas that need deeper investigation
+</Report>
 ```
 
-**Step 2: Start Complex Task A Stage 1**
+**Stage 2/5: Identify Removable Code**
 ```
-run agent "
 Read the README.md file first.
 
-Grand Goal: Fix the contact form validation
-History / Previous stages: None - this is stage 1
-Current Mission (Stage 1/N): Diagnose the validation issue by examining the contact form code and identifying what's failing
+Role: You are a codebase analyst specializing in dead code detection.
 
-Do exactly this mission and nothing else.
-"
+<GrandGoal>
+Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
+</GrandGoal>
+
+<PreviousStages>
+- Stage 1 completed: Full codebase mapped. Core identified as [core modules]. Peripheral features: [list]. Dependencies documented at [locations].
+</PreviousStages>
+
+<YourMission>
+Stage 2/5: Identify all code that can be safely removed.
+</YourMission>
+
+<Steps>
+1. Review the exploration report from Stage 1
+2. For each peripheral feature, trace all imports and usages
+3. Classify each item: REMOVE (no dependents), DEPENDS (other code needs it), UNCERTAIN
+4. Create a prioritized removal plan — items with no dependents first
+</Steps>
+
+<Constraints>
+- Do not delete or modify anything
+- Be conservative — if unsure, mark it UNCERTAIN
+</Constraints>
+
+<Report>
+1. Complete removal plan ordered by safety
+2. For each item: path, what it does, why it can be removed, dependent count
+3. UNCERTAIN items with explanation
+4. Recommended removal order
+</Report>
 ```
 
-**Step 3: Start Complex Task B Stage 1**
+**Stage 3/5: Remove Non-Breaking Code**
 ```
-run agent "
 Read the README.md file first.
 
-Grand Goal: Build a new dashboard page
-History / Previous stages: None - this is stage 1
-Current Mission (Stage 1/N): Create the basic dashboard page structure and routing
+Role: You are a developer executing a carefully planned code removal.
 
-Do exactly this mission and nothing else.
-"
+<GrandGoal>
+Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
+</GrandGoal>
+
+<PreviousStages>
+- Stage 1 completed: Full codebase exploration and mapping
+- Stage 2 completed: Removal plan created. Tier 1 (no dependents): [list]. Tier 2 (one dependent): [list]. UNCERTAIN: [list].
+</PreviousStages>
+
+<YourMission>
+Stage 3/5: Remove Tier 1 items (no dependents) from the removal plan, and verify the project still builds.
+</YourMission>
+
+<Steps>
+1. Remove each Tier 1 item according to the plan
+2. After each removal, run the build to verify nothing broke
+3. If a removal breaks the build, restore it and document why
+4. Update the removal plan with results
+</Steps>
+
+<Constraints>
+- Remove only Tier 1 items
+- Stop and report immediately if the build breaks
+- Do not touch Tier 2 or UNCERTAIN items
+</Constraints>
+
+<Report>
+1. Files deleted (full paths)
+2. Build verification results after each removal
+3. Any items that couldn't be removed and why
+4. Updated removal plan reflecting what was removed
+5. Any new insights about remaining items
+</Report>
 ```
 
-**Step 4: Wait for all three parallel tasks**
-- Copyright update completes
-- Complex Task A Stage 1 completes
-- Complex Task B Stage 1 completes
-
-**Step 5: Continue complex tasks with Stage 2+**
-
-Continue staging each complex task independently until complete.
+**The orchestrator continues with Stage 4 (remove features), then Stage 5 (final cleanup), each building on the previous stage's report.**
 
 ---
 
-## Common Patterns
+## Example 4: Verification Stage Pattern
+
+After a significant stage completes, spawn a verification agent:
+
+```
+Read the README.md file first.
+
+Role: You are a quality assurance engineer verifying recent changes.
+
+<GrandGoal>
+[Same as other stages]
+</GrandGoal>
+
+<PreviousStages>
+- Stage 1: [completed work]
+- Stage 2: [completed work]
+- Stage 3: [completed work — THIS is what you're verifying]
+</PreviousStages>
+
+<YourMission>
+Verify Stage 3: Check that the changes are correct, complete, and don't introduce issues.
+</YourMission>
+
+<Steps>
+1. Build the project — confirm it succeeds
+2. Run existing tests — confirm they pass
+3. Review the changes for:
+   - Consistency with project conventions
+   - Missing edge cases
+   - Unused imports or dead code introduced
+   - Integration with previous stages' work
+4. Test the affected functionality manually if applicable
+</Steps>
+
+<Report>
+1. Build status
+2. Test results
+3. Issues found (if any)
+4. Overall assessment: READY / NEEDS FIXES
+</Report>
+```
+
+---
+
+## Common Patterns Summary
 
 ### Pattern: Simple Chain
-Multiple independent simple tasks → Run all in parallel
+Multiple independent simple tasks → All in parallel
 
 ### Pattern: Complex Cascade
-Complex task with stages → Run sequentially, wait between stages
+Multi-stage complex task → Sequential, wait between stages, context chain
 
 ### Pattern: Dependent Trigger
-Complex task + dependent simple task → Queue simple, run after stage
+Complex task + dependent simple task → Queue simple, run after prerequisite stage
 
 ### Pattern: Mixed Load
-Simple + Complex tasks together → Run simple parallel, stage complex
+Simple + Complex together → Simple in parallel, Complex staged
+
+### Pattern: Startup Model
+Large project → Stages ordered by dependency (exploration → planning → execution → verification → cleanup), each stage inherits from previous, verification gates between significant stages
+
+---
 
 ## Troubleshooting
 
-**Problem: Sub-agent asking for clarification**
-→ Context was too minimal. Add necessary details while staying focused.
+**Sub-agent asking for clarification** → Context was too minimal. Add necessary details while staying focused.
 
-**Problem: Sub-agent doing wrong thing**
-→ Task description wasn't specific enough. Make it exact and bounded.
+**Sub-agent doing wrong thing** → Task description wasn't specific enough. Add steps, constraints, and expected output format.
 
-**Problem: Stage depends on output from previous stage**
-→ Ensure you're waiting for completion and including relevant output in next stage's context.
+**Stage depends on output from previous stage** → Ensure you're waiting for completion and including the structured report in next stage's PreviousStages.
 
-**Problem: Tasks conflicting with each other**
-→ Check dependency detection. They may not be as independent as you thought.
+**Tasks conflicting with each other** → Check dependency detection. They may not be as independent as you thought.
+
+**Build breaks after a stage** → Spawn a fix agent immediately. Don't continue other stages. Add a verification stage before continuing.
+
+**Context too large for one stage** → Split into another stage. Each stage's prompt should be 15-35 lines.

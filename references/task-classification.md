@@ -2,118 +2,125 @@
 
 ## Classification Framework
 
-For every user request (even if it contains multiple tasks), you MUST:
+For every user request, split it into atomic tasks, classify, and detect dependencies.
 
 ### Step 1: Split the Request
-Break the user request into individual, atomic tasks.
+Break the user's request into individual, atomic tasks.
 
 ### Step 2: Classify Each Task
 
-**SIMPLE Task** — Small, isolated change that can be done in one shot:
+**SIMPLE** — One-shot, isolated changes:
 - Change a color value
-- Add 3 circles to hero section
 - Fix a typo
-- Update one prop
+- Update a prop or label
 - Add a single className
-- Change a button label
 - Modify a single CSS rule
+- Any single-file, single-change task
 
-**COMPLEX Task** — Anything requiring multiple steps, planning, or coordination:
+**COMPLEX** — Multi-step, coordinated work:
 - New feature implementation
 - Code refactoring
-- Testing loops (write → test → fix)
 - Multiple file modifications
 - Dead-code cleanup across files
 - Architecture changes
 - Integration work
 - Performance optimization
+- Testing loops (write → test → fix)
 
 ### Step 3: Detect Dependencies
 
-Analyze relationships between tasks:
+**Dependent tasks** need output from another task first:
+- Adding a navbar link needs the page to exist first
+- Integration testing needs the feature to be built
+- Queue these after the prerequisite completes
 
-**Dependent Task** — If a simple task is related to / depends on a complex task:
-- Queue it
-- Run it ONLY after the relevant stage of the complex task is finished
+**Independent tasks** have no relationship:
+- Changing a button color and fixing a footer typo
+- Run these in parallel
 
-**Independent Task** — If tasks are completely unrelated:
-- Run them in parallel
-- No queuing needed
+---
 
-## Execution Ordering Rules
+## Execution Ordering
 
-### Independent SIMPLE Tasks
-Run all independent SIMPLE tasks **immediately in parallel**.
+### Independent SIMPLE tasks
+Run immediately in parallel. These are isolated changes.
 
-**Why:** These are isolated changes with no dependencies. Maximum parallelization.
+### COMPLEX tasks
+Run in sequential stages, waiting between each.
 
-### COMPLEX Tasks
-Start COMPLEX tasks in **stages** (one stage at a time).
+### Dependent SIMPLE tasks
+Queue after the relevant complex stage completes.
 
-**Why:** Complex tasks require coordination. Stages may depend on previous stage outputs.
+---
 
-### Dependent SIMPLE Tasks
-Run dependent SIMPLE tasks **only after** their related complex stage is complete.
+## Staging Complex Tasks
 
-**Why:** They may need outputs, context, or completed state from the complex task.
+When a task is COMPLEX, break it into stages following these principles:
+
+### 1. Avoid conflict — separate interdependent tasks
+If two stages modify the same file or system, they should run sequentially, not in parallel. Changes that interact should be in the same stage or clearly ordered.
+
+### 2. Maximize parallel — group truly independent work
+If Stage A touches frontend and Stage B touches backend with no interaction, they can run in parallel.
+
+### 3. Foundation first — order by dependency
+Database schema → API endpoints → Frontend forms → Styling → Testing. Each layer depends on the previous.
+
+### 4. Context chain — each stage inherits from previous
+Every sub-agent receives: Grand Goal + Summary of previous stages + Their specific mission.
+
+### 5. Verification gates — catch issues early
+After critical stages, have the next stage begin by verifying the previous stage's work before building on it.
+
+### 6. Structured reporting — ask for specific information
+Tell sub-agents exactly what to report: files created, decisions made, assumptions, risks, suggestions. This feeds the context chain.
+
+---
 
 ## Dependency Detection Examples
 
 ### Example 1: Independent Tasks
-**User request:** "Change the button color to blue and fix the typo in the header"
+**Request:** "Change the button color to blue and fix the typo in the header"
 
-Classification:
-- Task A (change button color): SIMPLE, independent
+- Task A (button color): SIMPLE, independent
 - Task B (fix typo): SIMPLE, independent
 
-Execution: Run both in parallel immediately.
+Run both in parallel.
 
 ### Example 2: Dependent Tasks
-**User request:** "Add a new user profile page and then add a link to it in the navbar"
+**Request:** "Add a new user profile page and add a link to it in the navbar"
 
-Classification:
-- Task A (add profile page): COMPLEX (new feature, multiple files)
-- Task B (add navbar link): SIMPLE, but DEPENDENT (needs page to exist first)
+- Task A (profile page): COMPLEX (new feature, multiple files)
+- Task B (navbar link): SIMPLE, dependent (needs page route to exist)
 
-Execution:
-1. Start Task A (COMPLEX) in stages
-2. After Task A stage completes (page exists), queue Task B
-3. Run Task B (SIMPLE) with context about the new page
+Run Task A Stage 1 first. After page exists, run Task B.
 
 ### Example 3: Mixed Tasks
-**User request:** "Fix the typo in the footer, refactor the auth system, and update the copyright year"
+**Request:** "Fix the typo in the footer, refactor the auth system, and update the copyright year"
 
-Classification:
-- Task A (fix footer typo): SIMPLE, independent
+- Task A (fix typo): SIMPLE, independent
 - Task B (refactor auth): COMPLEX, multi-stage
 - Task C (update copyright): SIMPLE, independent
 
-Execution:
-1. Run Task A and Task C in parallel immediately
-2. Start Task B Stage 1
-3. Continue Task B stages sequentially
+Run A and C in parallel. Start B Stage 1 simultaneously.
+
+---
 
 ## Task Classification Checklist
 
-Before executing, verify:
+Before executing:
 - [ ] Request split into atomic tasks
 - [ ] Each task classified (SIMPLE/COMPLEX)
 - [ ] Dependencies mapped
 - [ ] Execution order planned
 - [ ] Independent simple tasks identified for parallel execution
-- [ ] Complex task stages outlined (if applicable)
+- [ ] Complex task stages outlined
 - [ ] Dependent tasks queued properly
 
-## Common Classification Mistakes
+## Common Mistakes
 
-**Mistake:** Treating multi-file changes as SIMPLE
-**Correction:** If it touches multiple files with coordination needs, it's COMPLEX
-
-**Mistake:** Running dependent tasks immediately
-**Correction:** Queue them. They need the complex task output first.
-
-**Mistake:** Not splitting combined requests
-**Correction:** Always break into individual tasks first
-
-**Mistake:** Classifying based on time estimate alone
-**Correction:** Complexity is about coordination needs, not just duration
+- Treating multi-file changes as SIMPLE → If it touches multiple files with coordination needs, it's COMPLEX
+- Running dependent tasks immediately → Queue them. They need the prerequisite output.
+- Not splitting combined requests → Always break into individual tasks first
+- Classifying by time estimate alone → Complexity is about coordination needs, not duration
+- Staging without verification → Always verify critical stages before building on them
