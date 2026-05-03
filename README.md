@@ -6,12 +6,14 @@ A skill that transforms you into the Orchestrator Agent — the manager and dire
 
 This skill establishes a professional protocol for managing sub-agents:
 
+- **Project Docs Protocol** — Mandatory `/orchestrator-agent-docs/` knowledge base, auto-created if missing, updated after every task
 - **Zero Direct Execution** — You never edit files, write code, or run tests yourself. You spawn sub-agents for everything.
-- **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks
+- **Selective Read Access** — Orchestrator reads docs and project files for coordination, not implementation
+- **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks with conflict detection
 - **Dependency Management** — Detect task dependencies and queue them properly
-- **Prompt Engineering** — Write effective sub-agent prompts using role assignment, delimiters, structured output formats, and skill suggestions
-- **Skill Discovery** — Proactively suggest relevant skills to sub-agents so they work with the right tools and knowledge
-- **Stage Planning** — Break large tasks into ordered stages with context chains and verification gates
+- **Prompt Engineering** — Write effective sub-agent prompts using role assignment, delimiters, structured output formats
+- **Skill Discovery** — Proactively suggest relevant skills to sub-agents
+- **Failure Protocol** — Retry limits (3), escalation, rollback, hallucination detection
 
 ## Installation
 
@@ -33,8 +35,9 @@ This creates a `.orchestrator` config file. If not configured, agents default to
 ## Usage
 
 1. Activate the skill: "Use the orchestrator-agent skill"
-2. Read README.md yourself
-3. For each request:
+2. Orchestrator checks for `/orchestrator-agent-docs/` — creates them if missing
+3. Reads project docs to understand the project
+4. For each request:
    - Split into atomic tasks
    - Classify: SIMPLE vs COMPLEX
    - Detect dependencies
@@ -62,26 +65,27 @@ This creates a `.orchestrator` config file. If not configured, agents default to
 
 ## Core Principles
 
-1. **Only the orchestrator reads README.md** — every sub-agent is told to read it too
-2. **Every sub-agent prompt is a system prompt** — write it with care: role, delimiters, steps, constraints, output format
-3. **Skills are tools — suggest them** — tell sub-agents which skills would help them before they start
-4. **Large tasks are staged** — foundation first, verification gates, context chains
-5. **Structured reports matter** — tell sub-agents exactly what to report so you can make informed decisions
+1. **Every agent reads the project docs** — `/orchestrator-agent-docs/` is the single source of project truth. Created automatically if missing, updated after every task.
+2. **Read to understand, spawn to execute** — orchestrator reads docs and relevant files for coordination, never writes or runs commands
+3. **Every sub-agent prompt is a system prompt** — write it with care: role, delimiters, steps, constraints, output format
+4. **Skills are tools — suggest them** — tell sub-agents which skills would help them before they start
+5. **Large tasks are staged** — foundation first, verification gates, context chains
+6. **Fail gracefully** — retry twice, then escalate. Never loop.
 
 ## Structure
 
 ```
 orchestrator-agent/
-├── SKILL.md              # Entry point with core workflow
-├── README.md             # This file
-├── scripts/
-│   └── setup.js          # Interactive configuration
+├── SKILL.md                      # Entry point with core workflow
+├── README.md                     # This file
 └── references/
-    ├── core-rules.md     # Rules and rationale
-    ├── task-classification.md  # SIMPLE vs COMPLEX, staging
-    ├── context-handoff.md      # Prompt engineering & context
-    ├── execution-protocol.md   # Complete execution flow
-    └── examples.md           # Real-world scenarios
+    ├── core-rules.md             # Rules and permission boundaries
+    ├── project-docs-protocol.md  # Full docs creation and maintenance protocol
+    ├── task-classification.md    # SIMPLE vs COMPLEX, staging, conflict detection
+    ├── context-handoff.md        # Prompt engineering and context
+    ├── execution-protocol.md     # Complete execution flow
+    ├── failure-protocol.md       # Retry, escalation, rollback
+    └── examples.md               # Real-world scenarios
 ```
 
 ## Requirements

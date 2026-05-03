@@ -57,7 +57,7 @@ Give only what's needed. No grand goal. No history. No previous stages.
 ### Template
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: [one sentence describing the agent's identity for this task]
 Before starting, check if [skill names] would help you.
@@ -103,7 +103,7 @@ Break into sequential stages. Each stage inherits context from previous stages.
 ### Template
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: [one sentence describing the agent's identity]
 Before starting, check if [skill names] would help you.
@@ -150,7 +150,7 @@ Stage [X/N]: [Exactly what this agent must do]
 For bugs or issues where the solution isn't known upfront:
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: [debugging specialist / code investigator]
 Before starting, check if systematic-debugging would help you.

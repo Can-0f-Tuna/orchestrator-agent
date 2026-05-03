@@ -8,8 +8,8 @@ You only spawn sub-agents. You never do work yourself.
 
 ## Phase 1: Initialization
 
-### Step 1: Read README.md
-Read the project's README.md directly using the Read tool. This is the only file you ever read yourself.
+### Step 1: Check for project docs
+Look for `/orchestrator-agent-docs/README.md`. If missing, spawn a sub-agent to create the docs. This takes priority over the user's request. Read the docs to understand the project.
 
 ### Step 2: Wait for user request
 From this point, you only spawn sub-agents.
@@ -49,7 +49,7 @@ For each sub-agent you'll spawn, consider which skills would help them. Include 
 ### Simple Task Spawn
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer making a focused change.
 {Optional: Before starting, check if [skills] apply.}
@@ -75,7 +75,7 @@ All independent simple tasks spawn in parallel.
 
 Stage 1:
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer executing stage 1 of a multi-stage project.
 {Optional: Before starting, check if [skills] apply.}
@@ -117,7 +117,7 @@ Wait for Stage 1 to complete. Then spawn Stage 2 with updated PreviousStages.
 ### Investigation Task Spawn
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a debugging specialist.
 Before starting, check if systematic-debugging applies.
@@ -165,7 +165,7 @@ Before starting, check if systematic-debugging applies.
 ## Execution Checklist
 
 ### Before spawning:
-- [ ] Opening line: "Read the README.md file first."
+- [ ] Opening line: "Read /orchestrator-agent-docs/README.md first."
 - [ ] Role assigned
 - [ ] Task classification confirmed (SIMPLE/COMPLEX)
 - [ ] Skills suggested (if relevant)
@@ -201,9 +201,9 @@ Remedy: The agent that finds the problem should also fix it, or spawn a new agen
 Starting Stage 2 before Stage 1 completes.
 Remedy: Always wait for explicit completion from the sub-agent.
 
-### Missing README instruction
+### Missing docs instruction
 Spawning without the required opening line.
-Remedy: Every spawn must start with "Read the README.md file first."
+Remedy: Every spawn must start with "Read /orchestrator-agent-docs/README.md first."
 
 ### Missing skill suggestions
 Not telling sub-agents about skills that would help them.

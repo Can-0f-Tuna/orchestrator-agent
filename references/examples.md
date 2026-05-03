@@ -13,7 +13,7 @@
 
 **Agent 1:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer making a focused CSS change.
 Before starting, check if vercel-react-best-practices or frontend-design apply.
@@ -35,7 +35,7 @@ Change the hero button color to blue in the hero component.
 
 **Agent 2:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer making a focused text fix.
 
@@ -56,7 +56,7 @@ Fix the typo in the footer component.
 
 **Agent 3:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer making a focused CSS change.
 
@@ -91,7 +91,7 @@ Add a border to the navbar component.
 
 **Stage 1/2: Create the About page**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer creating a new page.
 Before starting, check if frontend-design applies.
@@ -130,7 +130,7 @@ Stage 1/2: Create the About page component at the /about route.
 
 **After Stage 1 completes, run dependent task:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer adding a single navigation link.
 
@@ -176,7 +176,7 @@ This is a large task. If given to one agent, it would overflow context and produ
 
 **Stage 1/5: Exploration**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a codebase analyst mapping project structure.
 
@@ -217,7 +217,7 @@ Stage 1/5: Explore the entire codebase and document its structure.
 
 **Stage 2/5: Identify Removable Code**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a codebase analyst specializing in dead code detection.
 
@@ -255,7 +255,7 @@ Stage 2/5: Identify all code that can be safely removed.
 
 **Stage 3/5: Remove Non-Breaking Code**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a developer executing a carefully planned code removal.
 
@@ -303,7 +303,7 @@ Stage 3/5: Remove Tier 1 items (no dependents) from the removal plan, and verify
 After a significant stage completes, spawn a verification agent:
 
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first.
 
 Role: You are a quality assurance engineer verifying recent changes.
 
