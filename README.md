@@ -1,17 +1,15 @@
 # Orchestrator Agent
 
-A skill that transforms you into the Orchestrator Agent — the manager and director of all sub-agents. Orchestrate, delegate, coordinate, and supervise without doing any direct work yourself.
+A skill that transforms you into the Orchestrator Agent — the manager and director of all sub-agents. Orchestrate, delegate, coordinate, and supervise. Read to understand. Spawn to execute.
 
 ## What It Does
 
-This skill establishes a professional protocol for managing sub-agents:
-
-- **Zero Direct Execution** — You never edit files, write code, or run tests yourself. You spawn sub-agents for everything.
-- **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks
-- **Dependency Management** — Detect task dependencies and queue them properly
-- **Prompt Engineering** — Write effective sub-agent prompts using role assignment, delimiters, structured output formats, and skill suggestions
-- **Skill Discovery** — Proactively suggest relevant skills to sub-agents so they work with the right tools and knowledge
+- **Project Docs Protocol** — Automatic creation and maintenance of `/orchestrator-agent-docs/`, a structured knowledge base that every agent reads to understand the project
+- **Selective Read Access** — Orchestrator reads project docs and specific files to coordinate intelligently, without doing implementation work
+- **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks with conflict detection
+- **Prompt Engineering** — Structured sub-agent prompts with XML delimiters, role assignment, report formats, and skill discovery
 - **Stage Planning** — Break large tasks into ordered stages with context chains and verification gates
+- **Failure Protocol** — Retry limits, escalation paths, rollback strategies, hallucination detection
 
 ## Installation
 
@@ -19,80 +17,42 @@ This skill establishes a professional protocol for managing sub-agents:
 npx skills add https://github.com/Can-0f-Tuna/orchestrator-agent.git --skill orchestrator-agent
 ```
 
-## Setup
-
-Run the setup script to configure which file agents should read to understand your project:
-
-```bash
-cd ~/.agents/skills/orchestrator-agent
-node scripts/setup.js
-```
-
-This creates a `.orchestrator` config file. If not configured, agents default to reading `README.md`.
-
 ## Usage
 
-1. Activate the skill: "Use the orchestrator-agent skill"
-2. Read README.md yourself
-3. For each request:
-   - Split into atomic tasks
-   - Classify: SIMPLE vs COMPLEX
-   - Detect dependencies
-   - Identify relevant skills for each sub-agent
-   - Execute:
-     - Independent SIMPLE → parallel
-     - COMPLEX → sequential stages
-     - DEPENDENT → queued after prerequisite
-
-## Example
-
-**User says:** "Change the button color to blue and create a new About page with a navbar link"
-
-**Orchestrator does:**
-1. Classifies:
-   - "Change button color" → SIMPLE, independent
-   - "Create About page" → COMPLEX (staged)
-   - "Add navbar link" → SIMPLE, dependent on page creation
-2. Identifies skills: suggests frontend-design for the About page agent
-3. Executes:
-   - Spawns button color agent (parallel)
-   - Starts Stage 1 of About page creation
-   - After Stage 1 completes, spawns navbar link agent
-4. Reports results
+1. Activate: "Use the orchestrator-agent skill"
+2. Orchestrator checks for `/orchestrator-agent-docs/` — creates them if missing
+3. Reads docs to understand the project
+4. For each request: split, classify, detect conflicts, spawn sub-agents, update docs
 
 ## Core Principles
 
-1. **Only the orchestrator reads README.md** — every sub-agent is told to read it too
-2. **Every sub-agent prompt is a system prompt** — write it with care: role, delimiters, steps, constraints, output format
-3. **Skills are tools — suggest them** — tell sub-agents which skills would help them before they start
-4. **Large tasks are staged** — foundation first, verification gates, context chains
-5. **Structured reports matter** — tell sub-agents exactly what to report so you can make informed decisions
+1. **Read to understand, spawn to execute** — orchestrator reads docs + relevant files, never writes or runs commands
+2. **Every agent reads the project docs** — `/orchestrator-agent-docs/` is the single source of project truth
+3. **Skills are discovered, not hardcoded** — tell sub-agents to check what's available
+4. **Prompts are system prompts** — role, delimiters, steps, constraints, report format
+5. **Fail gracefully** — retry twice, then escalate. Never loop. Verify critical stages.
+6. **Docs stay current** — update after every task
 
 ## Structure
 
 ```
 orchestrator-agent/
-├── SKILL.md              # Entry point with core workflow
-├── README.md             # This file
-├── scripts/
-│   └── setup.js          # Interactive configuration
-└── references/
-    ├── core-rules.md     # Rules and rationale
-    ├── task-classification.md  # SIMPLE vs COMPLEX, staging
-    ├── context-handoff.md      # Prompt engineering & context
-    ├── execution-protocol.md   # Complete execution flow
-    └── examples.md           # Real-world scenarios
+├── SKILL.md                          # Entry point — core workflow
+├── README.md                         # This file
+├── references/
+│   ├── core-rules.md                 # Rules and permission boundaries
+│   ├── project-docs-protocol.md      # Full docs creation and maintenance protocol
+│   ├── task-classification.md        # Classification + conflict detection
+│   ├── prompt-templates.md           # All spawn templates + prompt engineering
+│   ├── failure-protocol.md           # Retry, escalation, rollback, hallucination
+│   └── examples.md                   # Real-world scenarios
 ```
 
 ## Requirements
 
-- Agent framework with sub-agent spawning capability (Claude Code, Codex, etc.)
-- `task` tool access for spawning sub-agents
+- Agent framework with sub-agent spawning capability
+- Write access to create `/orchestrator-agent-docs/` in the project root
 
 ## License
 
-MIT License — Free to use, modify, and distribute.
-
----
-
-**Remember:** You are the conductor, not the musician. Orchestrate only. Never perform.
+MIT License

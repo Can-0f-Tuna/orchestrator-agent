@@ -1,25 +1,48 @@
 # Examples
 
-## Example 1: Three Simple Independent Tasks
+## Example 1: First Session — Docs Don't Exist
 
-**User Request:** "Change the hero button color to blue, fix the typo in the footer, and add a border to the navbar"
+**User Request:** "Change the button color to blue"
 
-### Classification
-- Task A: Change hero button color → SIMPLE, independent
-- Task B: Fix footer typo → SIMPLE, independent
-- Task C: Add navbar border → SIMPLE, independent
+### What the orchestrator does:
 
-### Execution — All three spawned in parallel
+1. Checks for `/orchestrator-agent-docs/` — not found
+2. **Stops the user's request.** Spawns a project analyst to create docs.
+3. After docs are created, reads them to understand the project.
+4. Now proceeds with the original request.
 
-**Agent 1:**
+### Orchestrator spawns the doc creation agent:
 ```
-Read the README.md file first.
+Read the project README.md and any key config files first.
 
-Role: You are a developer making a focused CSS change.
-Before starting, check if vercel-react-best-practices or frontend-design apply.
+Role: You are a project analyst. Your job is to understand this project completely and document it for AI agents.
 
 <Task>
-Change the hero button color to blue in the hero component.
+Create the directory /orchestrator-agent-docs/ with every required file:
+- README.md (project overview, 100-150 lines)
+- architecture.md
+- file-structure.md
+- conventions.md
+- commands.md
+- dependencies.md
+- state.md
+- modules/ (one per major feature)
+
+Each file must contain real, specific content — no placeholders.
+</Task>
+
+[Full instructions from project-docs-protocol.md]
+```
+
+### After docs are created, orchestrator reads them, then spawns:
+```
+Read /orchestrator-agent-docs/README.md first.
+Before starting, check if any skills apply.
+
+Role: Developer making a focused CSS change.
+
+<Task>
+Change the hero button color to blue.
 </Task>
 
 <Constraints>
@@ -28,73 +51,88 @@ Change the hero button color to blue in the hero component.
 
 <Report>
 1. File changed
-2. Exact change made
-3. Confirmation it works
+2. Exact change
+3. Confirmation
 </Report>
+```
+
+### After task completes, orchestrator updates docs:
+```
+Read /orchestrator-agent-docs/README.md first.
+
+Role: Documentation maintainer.
+
+<Task>
+Update state.md: "Changed hero button color to blue. File: components/Hero.tsx"
+</Task>
+```
+
+---
+
+## Example 2: Three Simple Independent Tasks
+
+**User Request:** "Change the hero button color to blue, fix the typo in the footer, and add a border to the navbar"
+
+### Orchestrator analysis:
+1. Task A: Hero button color → SIMPLE, in `components/Hero.tsx`
+2. Task B: Footer typo → SIMPLE, in `components/Footer.tsx`
+3. Task C: Navbar border → SIMPLE, in `components/Navbar.tsx`
+4. Conflict check: three different files → safe for parallel
+
+### Execution — all three spawned in parallel:
+
+**Agent 1:**
+```
+Read /orchestrator-agent-docs/README.md first.
+Before starting, check if any skills apply.
+Role: Developer making a focused CSS change.
+<Task>Change the hero button color to blue.</Task>
+<Constraints>Do exactly this and nothing else.</Constraints>
+<Report>1. File changed 2. Exact change 3. Confirmation</Report>
 ```
 
 **Agent 2:**
 ```
-Read the README.md file first.
-
-Role: You are a developer making a focused text fix.
-
-<Task>
-Fix the typo in the footer component.
-</Task>
-
-<Constraints>
-- Do exactly this and nothing else
-</Constraints>
-
-<Report>
-1. File changed
-2. Exact change made
-3. Confirmation it works
-</Report>
+Read /orchestrator-agent-docs/README.md first.
+Before starting, check if any skills apply.
+Role: Developer fixing a typo.
+<Task>Fix the typo in the footer.</Task>
+<Constraints>Do exactly this and nothing else.</Constraints>
+<Report>1. File changed 2. Exact change 3. Confirmation</Report>
 ```
 
 **Agent 3:**
 ```
-Read the README.md file first.
-
-Role: You are a developer making a focused CSS change.
-
-<Task>
-Add a border to the navbar component.
-</Task>
-
-<Constraints>
-- Do exactly this and nothing else
-</Constraints>
-
-<Report>
-1. File changed
-2. Exact change made
-3. Confirmation it works
-</Report>
+Read /orchestrator-agent-docs/README.md first.
+Before starting, check if any skills apply.
+Role: Developer adding a CSS border.
+<Task>Add a border to the navbar.</Task>
+<Constraints>Do exactly this and nothing else.</Constraints>
+<Report>1. File changed 2. Exact change 3. Confirmation</Report>
 ```
 
-**All three run in parallel. Orchestrator waits for all to complete, reports success.**
+### After all complete:
+Spawn doc update agent. Report to user.
 
 ---
 
-## Example 2: Complex Task with Dependent Simple Task
+## Example 3: Complex Task with Dependent Simple Task
 
 **User Request:** "Create a new About page and add a link to it in the navbar"
 
-### Classification
-- Task A: Create About page → COMPLEX (new feature)
-- Task B: Add navbar link → SIMPLE, DEPENDENT (needs page route)
+### Orchestrator analysis:
+1. Reads `/orchestrator-agent-docs/` — understands it's a Next.js app with file-based routing
+2. Task A: Create About page → COMPLEX (new page, new route)
+3. Task B: Add navbar link → DEPENDENT on A (needs route to exist)
 
-### Execution
+### Execution:
 
-**Stage 1/2: Create the About page**
+**Stage 1/1: Create About page**
 ```
-Read the README.md file first.
-
-Role: You are a developer creating a new page.
+Read /orchestrator-agent-docs/README.md first, then read modules/frontend.md.
 Before starting, check if frontend-design applies.
+
+Role: Developer creating a new page.
 
 <GrandGoal>
 Add an About page at /about and link it in the navbar.
@@ -105,272 +143,146 @@ None — this is stage 1.
 </PreviousStages>
 
 <YourMission>
-Stage 1/2: Create the About page component at the /about route.
+Stage 1/1: Create the About page at /about route.
 </YourMission>
 
 <Steps>
-1. Create the page component with proper layout and content
-2. Add the route in the routing configuration
+1. Create the page component at app/about/page.tsx following existing page patterns
+2. Add basic content: title, description, and a placeholder image section
 3. Verify the page renders at /about
 </Steps>
 
 <Constraints>
-- Only create the page and route
-- Follow existing project patterns for pages
+- Use existing page component patterns from /orchestrator-agent-docs/conventions.md
+- Only create the page — do not add the navbar link
 </Constraints>
 
 <Report>
-1. Files created/modified
+1. Files created
 2. Route path used
-3. Key decisions
+3. Key decisions about component structure
 4. Verification performed
-5. Suggestions for navbar link stage
+5. Note for navbar link stage: route is at /about, component is at app/about/page.tsx
 </Report>
 ```
 
-**After Stage 1 completes, run dependent task:**
+**After Stage 1 completes, spawn dependent task:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first, then read the navbar component's module docs.
+Before starting, check if any skills apply.
 
-Role: You are a developer adding a single navigation link.
+Role: Developer adding a navigation link.
 
 <Task>
-Add a link to the About page in the navbar.
+Add a link to the About page at /about in the navbar component.
 </Task>
 
 <Context>
-The About page is available at /about route.
+Stage 1 created the About page. Route: /about. Component: app/about/page.tsx.
 </Context>
 
 <Constraints>
-- Do exactly this and nothing else
-- Place the link in a logical position in the navbar
+- Add a single link — do not refactor the navbar
+- Place it in a logical position among existing links
 </Constraints>
 
 <Report>
 1. File changed
 2. Where the link was added
-3. Confirmation it navigates correctly
+3. Confirmation clicking navigates to /about
 </Report>
 ```
+
+### After both complete:
+Spawn doc update agent. Report to user.
 
 ---
 
-## Example 3: Large Multi-Stage Project
+## Example 4: Large Multi-Stage Project
 
-**User Request:** "We are forking this ABC repo from GitHub and our goal is to turn it into DEFG. Go through the entire codebase, remove what we don't need, and make sure we don't break the project."
+**User Request:** "We are forking this ABC repo from GitHub. Our goal is to turn it into DEFG. Go through the entire codebase, remove what we don't need, and make sure we don't break the project."
 
-### Classification
-- Task: Codebase cleanup → COMPLEX, requires multiple careful stages
+### Orchestrator analysis:
+This is massive. One agent cannot do this. Must be staged.
 
-### Stage Planning
-This is a large task. If given to one agent, it would overflow context and produce unreliable results. Break it into stages:
+### Stage plan:
+1. **Stage 1: Exploration** — Map the entire codebase, understand dependencies
+2. **Stage 2: Identification** — List all removable code with justifications
+3. **Stage 3: Safe removal** — Remove non-breaking code, verify build
+4. **Stage 4: Feature removal** — Remove identified features one at a time
+5. **Stage 5: Cleanup** — Dead imports, unused deps, final verification
+6. **Stage 6: Verification** — Full build + test, confirm nothing is broken
 
-1. **Stage 1: Exploration and mapping** — Understand the codebase structure, map dependencies
-2. **Stage 2: Identify removable code** — List files, modules, and features to remove
-3. **Stage 3: Remove non-breaking code** — Delete clearly unused code, verify project builds
-4. **Stage 4: Remove features** — Delete identified features one at a time, verify after each
-5. **Stage 5: Final cleanup** — Remove dead imports, unused dependencies, verify everything works
+### Execution (abbreviated):
 
-### Execution
-
-**Stage 1/5: Exploration**
+**Stage 1 spawn:**
 ```
-Read the README.md file first.
+Read /orchestrator-agent-docs/README.md first, then read architecture.md and file-structure.md.
 
-Role: You are a codebase analyst mapping project structure.
+Role: Codebase analyst.
 
 <GrandGoal>
-Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
+Transform ABC repo into DEFG by removing all unnecessary code without breaking the project.
 </GrandGoal>
 
-<PreviousStages>
-None — this is stage 1.
-</PreviousStages>
-
 <YourMission>
-Stage 1/5: Explore the entire codebase and document its structure.
+Stage 1/6: Map the entire codebase. Understand what everything is, how it connects, and what depends on what.
 </YourMission>
 
 <Steps>
-1. Map the directory structure and key entry points
-2. Identify which packages/modules are used
-3. Document how features connect to each other
-4. List all external dependencies
-5. Identify the core of the project (what must stay)
+1. Document the complete directory structure with annotations
+2. Identify all features, modules, and their dependencies
+3. Distinguish core vs. peripheral code
+4. List all external dependencies and where they're used
 </Steps>
 
-<Constraints>
-- Do not delete or modify any files
-- Focus only on understanding and documenting
-</Constraints>
-
 <Report>
-1. Complete directory tree
-2. Feature/module map with dependencies between them
-3. List of what appears to be the core vs. peripheral code
-4. External dependency list with usage locations
-5. Suggestions for what can safely be removed
-6. Any areas that need deeper investigation
+1. Complete annotated directory tree
+2. Feature/module dependency map
+3. Core vs. peripheral classification
+4. External dependency usage map
+5. Initial recommendations for removal candidates
 </Report>
 ```
 
-**Stage 2/5: Identify Removable Code**
+**After Stage 1, orchestrator reads the report, updates context for Stage 2:**
+
 ```
-Read the README.md file first.
-
-Role: You are a codebase analyst specializing in dead code detection.
-
-<GrandGoal>
-Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
-</GrandGoal>
-
 <PreviousStages>
-- Stage 1 completed: Full codebase mapped. Core identified as [core modules]. Peripheral features: [list]. Dependencies documented at [locations].
+- Stage 1 completed: Full codebase mapped. Core identified as [X]. 
+  Peripheral features: [A, B, C, D]. Dependency map saved.
 </PreviousStages>
 
 <YourMission>
-Stage 2/5: Identify all code that can be safely removed.
+Stage 2/6: Using the Stage 1 map, identify all removable code. 
+Classify as: SAFE (no dependents), RISKY (has dependents), KEEP (core).
 </YourMission>
-
-<Steps>
-1. Review the exploration report from Stage 1
-2. For each peripheral feature, trace all imports and usages
-3. Classify each item: REMOVE (no dependents), DEPENDS (other code needs it), UNCERTAIN
-4. Create a prioritized removal plan — items with no dependents first
-</Steps>
-
-<Constraints>
-- Do not delete or modify anything
-- Be conservative — if unsure, mark it UNCERTAIN
-</Constraints>
-
-<Report>
-1. Complete removal plan ordered by safety
-2. For each item: path, what it does, why it can be removed, dependent count
-3. UNCERTAIN items with explanation
-4. Recommended removal order
-</Report>
 ```
 
-**Stage 3/5: Remove Non-Breaking Code**
-```
-Read the README.md file first.
+### Key: After each stage, the orchestrator reads the report and builds an informed context chain for the next stage. Each stage's prompt includes:
+- Grand Goal (unchanged)
+- Summary of all previous stages (what was done, key findings, files created)
+- Current mission with specific instructions based on what was learned
 
-Role: You are a developer executing a carefully planned code removal.
-
-<GrandGoal>
-Transform the ABC repo into DEFG by removing all unnecessary code without breaking the project.
-</GrandGoal>
-
-<PreviousStages>
-- Stage 1 completed: Full codebase exploration and mapping
-- Stage 2 completed: Removal plan created. Tier 1 (no dependents): [list]. Tier 2 (one dependent): [list]. UNCERTAIN: [list].
-</PreviousStages>
-
-<YourMission>
-Stage 3/5: Remove Tier 1 items (no dependents) from the removal plan, and verify the project still builds.
-</YourMission>
-
-<Steps>
-1. Remove each Tier 1 item according to the plan
-2. After each removal, run the build to verify nothing broke
-3. If a removal breaks the build, restore it and document why
-4. Update the removal plan with results
-</Steps>
-
-<Constraints>
-- Remove only Tier 1 items
-- Stop and report immediately if the build breaks
-- Do not touch Tier 2 or UNCERTAIN items
-</Constraints>
-
-<Report>
-1. Files deleted (full paths)
-2. Build verification results after each removal
-3. Any items that couldn't be removed and why
-4. Updated removal plan reflecting what was removed
-5. Any new insights about remaining items
-</Report>
-```
-
-**The orchestrator continues with Stage 4 (remove features), then Stage 5 (final cleanup), each building on the previous stage's report.**
+### After all stages:
+Spawn verification agent. Update all docs with the new project state.
 
 ---
 
-## Example 4: Verification Stage Pattern
+## Example 5: Failure and Recovery
 
-After a significant stage completes, spawn a verification agent:
+**User Request:** "Add dark mode toggle to the settings page"
 
-```
-Read the README.md file first.
+### What happens:
+1. Orchestrator spawns Stage 1 agent to add the toggle
+2. Agent reports: "I changed Settings.tsx and added a ThemeContext.tsx, but the toggle doesn't work. I think the context provider isn't set up."
 
-Role: You are a quality assurance engineer verifying recent changes.
+### Orchestrator response:
+- **1st retry:** Spawn fix agent with the specific problem and code locations
+- Agent reports: "Fixed the context provider in _app.tsx. Toggle now works."
+- **Verification:** Spawn verification agent to confirm toggle works and nothing else broke
+- Verification confirms → update docs, report to user
 
-<GrandGoal>
-[Same as other stages]
-</GrandGoal>
-
-<PreviousStages>
-- Stage 1: [completed work]
-- Stage 2: [completed work]
-- Stage 3: [completed work — THIS is what you're verifying]
-</PreviousStages>
-
-<YourMission>
-Verify Stage 3: Check that the changes are correct, complete, and don't introduce issues.
-</YourMission>
-
-<Steps>
-1. Build the project — confirm it succeeds
-2. Run existing tests — confirm they pass
-3. Review the changes for:
-   - Consistency with project conventions
-   - Missing edge cases
-   - Unused imports or dead code introduced
-   - Integration with previous stages' work
-4. Test the affected functionality manually if applicable
-</Steps>
-
-<Report>
-1. Build status
-2. Test results
-3. Issues found (if any)
-4. Overall assessment: READY / NEEDS FIXES
-</Report>
-```
-
----
-
-## Common Patterns Summary
-
-### Pattern: Simple Chain
-Multiple independent simple tasks → All in parallel
-
-### Pattern: Complex Cascade
-Multi-stage complex task → Sequential, wait between stages, context chain
-
-### Pattern: Dependent Trigger
-Complex task + dependent simple task → Queue simple, run after prerequisite stage
-
-### Pattern: Mixed Load
-Simple + Complex together → Simple in parallel, Complex staged
-
-### Pattern: Startup Model
-Large project → Stages ordered by dependency (exploration → planning → execution → verification → cleanup), each stage inherits from previous, verification gates between significant stages
-
----
-
-## Troubleshooting
-
-**Sub-agent asking for clarification** → Context was too minimal. Add necessary details while staying focused.
-
-**Sub-agent doing wrong thing** → Task description wasn't specific enough. Add steps, constraints, and expected output format.
-
-**Stage depends on output from previous stage** → Ensure you're waiting for completion and including the structured report in next stage's PreviousStages.
-
-**Tasks conflicting with each other** → Check dependency detection. They may not be as independent as you thought.
-
-**Build breaks after a stage** → Spawn a fix agent immediately. Don't continue other stages. Add a verification stage before continuing.
-
-**Context too large for one stage** → Split into another stage. Each stage's prompt should be 15-35 lines.
+### If 1st fix fails:
+- **2nd retry:** Different approach — spawn agent to implement toggle as local state instead of context
+- If that fails too → **escalate to user** with both approaches documented
