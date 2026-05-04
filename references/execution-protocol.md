@@ -46,6 +46,32 @@ For each sub-agent you'll spawn, consider which skills would help them. Include 
 
 ## Phase 3: Execution
 
+### Plan File Parsing (for explicit dependency plans)
+
+If using a plan file with `depends_on` fields:
+
+**Step 1: Parse the plan**
+- Find task subsections (e.g., `### T1:` or `### Task 1:`)
+- Extract for each task: ID, `depends_on` list, description, location, validation
+- Build dependency graph
+
+**Step 2: Identify unblocked tasks**
+- Task is **unblocked** when all IDs in `depends_on` are complete
+- Tasks with `depends_on: []` are unblocked immediately
+
+**Step 3: Launch in waves**
+- Launch all unblocked tasks in parallel
+- Wait for wave to complete
+- Re-evaluate for newly unblocked tasks
+- Repeat until all tasks complete
+
+**Step 4: Validate and update**
+- Verify RED → GREEN test evidence or documented alternative
+- Ensure plan file is updated with status, log, and files
+- Confirm commits exist before moving to next wave
+
+---
+
 ### Simple Task Spawn
 
 ```
@@ -139,6 +165,41 @@ Before starting, check if systematic-debugging applies.
 3. Verification method
 4. Side effects to watch
 </Report>
+```
+
+---
+
+## TDD Validation in Execution
+
+### RED Phase (Test First)
+1. Subagent writes tests defining expected behavior
+2. Runs tests to confirm they FAIL (RED)
+3. Documents test command used
+
+### GREEN Phase (Implementation)
+1. Implements minimal code to make tests pass
+2. Runs tests until they PASS (GREEN)
+3. Does not weaken or remove tests unless requirements changed
+
+### Verification Requirements
+**Acceptable evidence:**
+- Test output showing RED → GREEN transition
+- Screenshot/terminal output of passing tests
+- Manual verification steps with concrete results
+- Static analysis output (lint/type check) passing
+
+**Not acceptable:**
+- "Tests pass" without output
+- "Should work" claims
+- Implementation without verification
+
+### Plan File Update
+After completion, subagents update the plan:
+```markdown
+- **status**: Completed
+- **log**: Concise work description
+- **files edited/created**: [list]
+- **verification**: RED (2 failures) → GREEN (all passing)
 ```
 
 ---

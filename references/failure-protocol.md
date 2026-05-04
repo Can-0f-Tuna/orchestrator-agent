@@ -72,13 +72,33 @@ Signs a sub-agent might be hallucinating:
 - A dependency is missing or broken in a way that blocks the task
 - Two sub-agents give contradictory information
 
-### Escalation format:
+### Escalation Format
 ```
-Task: [what we were trying to do]
-Attempted: [approaches tried]
-Result: [what happened]
-Question: [specific question — "should we do A or B?"]
+**Escalation Required:**
+- **Issue:** [Clear description of the problem]
+- **Options:** [List of valid approaches with trade-offs]
+- **Recommendation:** [Your suggestion with rationale]
+- **Impact:** [What happens if we wait vs decide now]
 ```
+
+---
+
+## Escalation Protocol (Full)
+
+### Must Escalate
+- A decision requires domain knowledge not captured in docs or skills
+- Multiple valid approaches exist with significant trade-offs
+- An action is irreversible and not covered by existing rules
+- An agent repeatedly fails and you cannot determine the fix
+- The task explicitly requires human judgment (design decisions, UX choices)
+- Conflicting requirements between tasks that cannot be reconciled
+
+### Do NOT Escalate
+- Routine approvals (use your judgment)
+- Standard operations within documented patterns
+- Work discovery and prioritization
+- Agent monitoring and follow-ups
+- Tasks that can proceed with reasonable assumptions
 
 ---
 

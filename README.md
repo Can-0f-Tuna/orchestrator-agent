@@ -10,10 +10,12 @@ This skill establishes a professional protocol for managing sub-agents:
 - **Zero Direct Execution** — You never edit files, write code, or run tests yourself. You spawn sub-agents for everything.
 - **Selective Read Access** — Orchestrator reads docs and project files for coordination, not implementation
 - **Task Classification** — Split work into SIMPLE (parallel) vs COMPLEX (staged) tasks with conflict detection
-- **Dependency Management** — Detect task dependencies and queue them properly
+- **Explicit Dependencies** — Use `depends_on` format to create execution waves and maximize parallelization
+- **Mandatory Plan Updates** — Every sub-agent MUST update the plan file after completing work (status, log, files, verification)
 - **Prompt Engineering** — Write effective sub-agent prompts using role assignment, delimiters, structured output formats
 - **Skill Discovery** — Proactively suggest relevant skills to sub-agents
 - **Failure Protocol** — Retry limits (3), escalation, rollback, hallucination detection
+- **TDD Validation** — RED-GREEN test pattern with verification evidence required
 
 ## Installation
 
@@ -70,7 +72,29 @@ This creates a `.orchestrator` config file. If not configured, agents default to
 3. **Every sub-agent prompt is a system prompt** — write it with care: role, delimiters, steps, constraints, output format
 4. **Skills are tools — suggest them** — tell sub-agents which skills would help them before they start
 5. **Large tasks are staged** — foundation first, verification gates, context chains
-6. **Fail gracefully** — retry twice, then escalate. Never loop.
+6. **Plan files must be updated** — Every sub-agent working from a plan MUST update it with status, log, files, and verification evidence. This is non-negotiable.
+7. **Fail gracefully** — retry twice, then escalate. Never loop.
+
+## Plan Files
+
+For complex projects with explicit dependencies, use plan files (`<topic>-plan.md`):
+
+### Format
+```
+T1: [depends_on: []] Create database schema
+T2: [depends_on: []] Install packages
+T3: [depends_on: [T1]] Create repository layer
+T4: [depends_on: [T1, T2]] Add API endpoints
+```
+
+### Critical Rule
+**Every sub-agent MUST update the plan file after completing work:**
+- Set `status`: Completed
+- Add `log`: Concise description of work done
+- Add `files edited/created`: Full paths to all modified files
+- Add `verification`: RED→GREEN test output or alternative evidence
+
+**Without these updates, the orchestrator cannot track progress or unblock dependent tasks.**
 
 ## Structure
 

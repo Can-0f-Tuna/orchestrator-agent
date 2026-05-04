@@ -106,16 +106,48 @@ Run A and C in parallel. Start B Stage 1 simultaneously.
 
 ---
 
+## Explicit Dependency Format
+
+For complex projects, use explicit task dependencies to maximize parallelization:
+
+### Format
+```
+T1: [depends_on: []] Create database schema
+T2: [depends_on: []] Install required packages
+T3: [depends_on: [T1]] Create repository layer
+T4: [depends_on: [T1]] Create service interfaces
+T5: [depends_on: [T3, T4]] Implement business logic
+T6: [depends_on: [T2, T5]] Add API endpoints
+```
+
+### Rules
+- Every task MUST have a `depends_on` field (empty `[]` for root tasks)
+- Task IDs are unique (T1, T2, T3.1, T3.2, etc.)
+- Tasks with empty/satisfied dependencies can run in parallel
+- Dependencies create execution waves automatically
+
+### Execution Waves
+
+| Wave | Tasks | Runs When |
+|------|-------|-----------|
+| 1 | T1, T2 | Immediately |
+| 2 | T3, T4 | After T1 completes |
+| 3 | T5 | After T3 and T4 complete |
+| 4 | T6 | After T2 and T5 complete |
+
+---
+
 ## Task Classification Checklist
 
 Before executing:
 - [ ] Request split into atomic tasks
 - [ ] Each task classified (SIMPLE/COMPLEX)
-- [ ] Dependencies mapped
+- [ ] Dependencies mapped (implicitly or explicitly with `depends_on`)
 - [ ] Execution order planned
 - [ ] Independent simple tasks identified for parallel execution
 - [ ] Complex task stages outlined
 - [ ] Dependent tasks queued properly
+- [ ] For explicit plans: execution waves calculated
 
 ## Common Mistakes
 
